@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait  # to wait for elements to load
 from selenium.webdriver.support import expected_conditions as EC
 
-element_list = []
+game_deals_list = []
 
 brave_path = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"  # brave path
 chromedriver_path = r"chromedriver-win64\chromedriver.exe"  # path to chromwdriver
@@ -17,6 +17,7 @@ service = Service(chromedriver_path)
 options = Options()
 options.binary_location = brave_path
 options.add_argument("--start-maximized")
+options.add_argument("--headless=new")
 
 driver = webdriver.Chrome(service=service, options=options)
 
@@ -36,44 +37,57 @@ try:
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(2)
 
-    title = WebDriverWait(driver, 480).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "StoreSaleWidgetTitle"))
-    )
-    rating = WebDriverWait(driver, 480).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "_2nuoOi5kC2aUI12z85PneA"))
-    )
-    ratingCount = WebDriverWait(driver, 480).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "_1wXL_MfRpdKQ3wZiNP5lrH"))
-    )
-    # description = WebDriverWait(driver, 480).until(
-    #     EC.presence_of_all_elements_located((By.CLASS_NAME, "StoreSaleWidgetShortDesc"))
-    # )
-    discountPercent = WebDriverWait(driver, 480).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "cnkoFkzVCby40gJ0jGGS4"))
-    )
-    currentPrice = WebDriverWait(driver, 480).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "_3j4dI1yA7cRfCvK8h406OB"))
-    )
-    origPrice = WebDriverWait(driver, 480).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "_3fFFsvII7Y2KXNLDk_krOW"))
+    game_list_container = WebDriverWait(driver, 480).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "_3EdZTDIisUpowxwm6uJ7Iq"))
     )
 
-    # Collect all the elements into the list
-    for i in range(len(title)):
-        element_list.append({
-            "title": title[i].text,
-            "rating": rating[i].text if i < len(rating) else "N/A",
-            "ratingCount": ratingCount[i].text if i < len(ratingCount) else "N/A",
-            # "description": description[i].text if i < len(description) else "N/A",
-            "origPrice": origPrice[i].text if i < len(origPrice) else "N/A",
-            "discountPercent": discountPercent[i].text if i < len(discountPercent) else "N/A",
-            "currentPrice": currentPrice[i].text if i < len(currentPrice) else "N/A"
-        })
+    individual_game_container = game_list_container.find_elements(By.CLASS_NAME, "gASJ2lL_xmVNuZkWGvrWg")
+
+    for individual_game in individual_game_container:
+        try:
+            title = individual_game.find_element(By.CLASS_NAME, "StoreSaleWidgetTitle").text
+        except:
+            title = "N/A"
+
+        try:
+            rating = individual_game.find_element(By.CLASS_NAME, "_2nuoOi5kC2aUI12z85PneA").text
+        except:
+            rating = "N/A"
+
+        try:
+            rating_count = individual_game.find_element(By.CLASS_NAME, "_1wXL_MfRpdKQ3wZiNP5lrH").text
+        except:
+            rating_count = "N/A"
+
+        try:
+            discount_percent = individual_game.find_element(By.CLASS_NAME, "cnkoFkzVCby40gJ0jGGS4").text
+        except:
+            discount_percent = "N/A"
+
+        try:
+            current_price = individual_game.find_element(By.CSS_SELECTOR, "div._3NhLu7mTdty7JufpSpz6Re > div._3j4dI1yA7cRfCvK8h406OB").text
+        except:
+            current_price = "N/A"
+
+        try:
+            orig_price = individual_game.find_element(By.CSS_SELECTOR, "div._3NhLu7mTdty7JufpSpz6Re > div._3fFFsvII7Y2KXNLDk_krOW").text
+        except:
+            orig_price = "N/A"
+
+        if title != "N/A":
+            game_deals_list.append({
+                "title": title,
+                "rating": rating,
+                "rating_count": rating_count,
+                "orig_price": orig_price,
+                "discount_percent": discount_percent,
+                "current_price": current_price
+            })
 
     # Output the result
-    for i in range(len(element_list)):
-        print(f"{element_list[i]}\n")
-    print(f"Found {len(element_list)} elements")
+    for game in game_deals_list:
+        print(f"{game}\n")
+    print(f"Found {len(game_deals_list)} elements")
 
 except Exception as e:
     print(f"Error occurred: {e}")
