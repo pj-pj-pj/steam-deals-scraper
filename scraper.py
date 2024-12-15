@@ -41,6 +41,30 @@ try:
         EC.presence_of_element_located((By.CLASS_NAME, "_3EdZTDIisUpowxwm6uJ7Iq"))
     )
 
+    # load more deals by clicking Show more button and waiting some
+    # hahahahahahaha steam pls don't block, also dont use while true
+    # while True:
+    for _ in range(300):
+        try:
+            showMoreBtn = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "_2tkiJ4VfEdI9kq1agjZyNz"))
+            )
+
+            showMoreBtn.click()
+
+            print(f"Clicked 'Show More' button. ({_})") # lets me know what is happening
+
+            time.sleep(random.uniform(9, 15))
+
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(random.uniform(5, 13))
+        except StaleElementReferenceException as e:
+            print(f"StaleElementReferenceException: {e}. Retrying.")
+            continue  # retry
+        except Exception as e:
+            print(f"Error during clicking 'Show More': {e}")
+            break  # if the button is no longer available
+
     individual_game_container = game_list_container.find_elements(By.CLASS_NAME, "gASJ2lL_xmVNuZkWGvrWg")
 
     for individual_game in individual_game_container:
