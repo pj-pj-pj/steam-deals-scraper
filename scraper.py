@@ -108,10 +108,10 @@ try:
                 "current_price": current_price
             })
 
-    # Output the result
-    for game in game_deals_list:
-        print(f"{game}\n")
-    print(f"Found {len(game_deals_list)} elements")
+    df = pd.DataFrame(game_deals_list)
+    df.to_excel('steam_specials.xlsx', index=False)
+
+    print("Scraping complete...")
 
 except Exception as e:
     print(f"Error occurred: {e}")
